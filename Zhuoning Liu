@@ -1,0 +1,49 @@
+
+set.seed(10)
+
+
+## 1. General Procedure
+
+
+## 1.a Generate a random sample of size `r n` with parameter $\lambda$=`r lambda`. 
+
+n=10
+lambda = 1
+B = 1000
+alpha = 0.05
+data = rpois (n, lambda)
+
+## 1. b Create and save a 95% CI for the mean of the population using the approximate confidence interval 1.
+
+lambda_hat = mean (data)
+approx_var = var (data)
+z <- qnorm(1-alpha/2)
+s <- sqrt(approx_var)
+moe <- z*s/sqrt(length(data))
+CI1 <- c(lambda_hat - moe, lambda_hat + moe)
+CI1
+
+
+## 1. c Create and save a 95% CI for the mean of the population using the approximate confidence interval 1.
+
+moe2 <- z*sqrt(lambda_hat)/sqrt(length(data))
+CI2 <- c(lambda_hat -moe2, lambda_hat + moe2)
+CI2
+
+
+## 1.d Create and save 95% CIs for the mean of the population using the parametric bootstrap method. ($B$ = `r B`)
+
+bootData <- replicate (n=B, expr = rpois (n, lambda_hat))
+means<-colMeans(bootData)
+c(quantile (means, 0.025), quantile (means, 0.975))
+
+
+## 1.e Create and save 95% CIs for the mean of the population using the nonparametric bootstrap method. ($B$ = `r B`)
+
+lambda_vec <- rep(NA, B)
+for(i in 1:B){
+  sel <- sample(1:n, n, replace=TRUE)
+  bootstrap_x <- data[sel]
+  lambda_vec[i] <- mean(bootstrap_x) }
+CI_b <- quantile(lambda_vec,c(0.025,0.975))
+CI_b
